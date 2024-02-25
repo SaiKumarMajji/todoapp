@@ -25,7 +25,7 @@ export default function SignUp() {
     }
 
     try {
-      const response = await fetch("/signup", {
+      const response = await fetch("http://localhost:3000/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

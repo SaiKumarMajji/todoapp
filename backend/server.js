@@ -5,13 +5,14 @@ const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = 3000;
 
-mongoose.connect(
-  "mongodb+srv://saikumar170325:Saikumar25%40@cluster0.univrkz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+const cors = require("cors");
+
+require("dotenv").config();
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const userSchema = new mongoose.Schema({
   uername: String,
@@ -22,8 +23,9 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 app.use(express.json());
+app.use(cors());
 
-app.post("/signup", async (req, res) => {
+app.post("/api/signup", async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
