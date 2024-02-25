@@ -7,7 +7,7 @@ export default function SignUp() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    password: "",
+    createPassword: "",
     confirmPassword: "",
   });
 
@@ -19,13 +19,13 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.createPassword !== formData.confirmPassword) {
       alert("Passwords do not match");
       return;
     }
 
     try {
-      const response = await fetch("/api/signup", {
+      const response = await fetch("/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export default function SignUp() {
     setFormData({
       username: "",
       email: "",
-      password: "",
+      createPassword: "",
       confirmPassword: "",
     });
   };
@@ -58,6 +58,7 @@ export default function SignUp() {
           <input
             type="text"
             placeholder="Enter Username"
+            name="username"
             value={formData.username}
             onChange={handleChange}
             required
@@ -65,6 +66,7 @@ export default function SignUp() {
           <br />
           <input
             type="email"
+            name="email"
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
@@ -73,14 +75,16 @@ export default function SignUp() {
           <br />
           <input
             type="password"
+            name="createPassword"
             placeholder="Create Password"
-            value={formData.password}
+            value={formData.createPassword}
             onChange={handleChange}
             required
           />
           <br />
           <input
             type="password"
+            name="confirmPassword"
             placeholder="Confirm Password"
             value={formData.confirmPassword}
             onChange={handleChange}

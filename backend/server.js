@@ -6,7 +6,7 @@ const app = express();
 const PORT = 3000;
 
 mongoose.connect(
-  "mongodb+srv://saikumar170325:Saikumar25@@cluster0.univrkz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+  "mongodb+srv://saikumar170325:Saikumar25%40@cluster0.univrkz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -23,7 +23,7 @@ const User = mongoose.model("User", userSchema);
 
 app.use(express.json());
 
-app.post("/register", async (req, res) => {
+app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
