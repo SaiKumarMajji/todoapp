@@ -107,7 +107,7 @@ input {
 .signup {
   background-color: white;
   border-radius: 10px;
-  height: 450px;
+  height: 400px;
   width: 450px;
   display: flex;
   flex-direction: column;
@@ -156,7 +156,7 @@ input {
 .login {
   background-color: white;
   border-radius: 10px;
-  height: 400px;
+  height: 350px;
   width: 450px;
   display: flex;
   flex-direction: column;

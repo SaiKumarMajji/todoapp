@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function SignUp() {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    createPassword: "",
-    confirmPassword: "",
+    password: "",
   });
 
   const handleChange = (e) => {
@@ -16,37 +15,25 @@ export default function SignUp() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (formData.createPassword !== formData.confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    try {
-      const response = await fetch("http://localhost:3000/api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        console.log("SignUp Successful");
+    axios
+      .post("http://localhost:3000/register", {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      })
+      .then((result) => {
+        console.log(result);
         navigate("/login");
-      } else {
-        const errorData = await response.json();
-        console.error("SignUp failed", errorData.message);
-      }
-    } catch (error) {
-      console.log("SignUp failed", error.message);
-    }
+      })
+      .catch((err) => console.log(err));
+
     setFormData({
       username: "",
       email: "",
-      createPassword: "",
-      confirmPassword: "",
+      password: "",
     });
   };
 
@@ -75,22 +62,14 @@ export default function SignUp() {
           <br />
           <input
             type="password"
-            name="createPassword"
+            name="password"
             placeholder="Create Password"
-            value={formData.createPassword}
+            value={formData.password}
             onChange={handleChange}
             required
           />
           <br />
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-          <br />
+
           <button>SignUp</button>
         </form>
         <p>

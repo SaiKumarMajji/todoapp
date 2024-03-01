@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Login() {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -16,18 +16,20 @@ export default function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const storedEmail = "";
-    const storedPassword = "";
-
-    if (
-      formData.email === storedEmail &&
-      formData.password === storedPassword
-    ) {
-      navigate.push("/todo");
-    } else {
-      alert("Invalid email or password");
-    }
+    axios
+      .post("http://localhost:3000/login", {
+        email: formData.email,
+        password: formData.password,
+      })
+      .then((result) => {
+        console.log(result);
+        if (result.data === "Success") {
+          navigate("/todo");
+        }
+      })
+      .catch((err) => console.log(err));
   };
+
   return (
     <div className="login-container">
       <div className="login">

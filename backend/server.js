@@ -1,50 +1,51 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
+const UserModel = require("./models/UserModel");
+const TaskModel = require("./models/TaskModel");
 const bcrypt = require("bcryptjs");
 
 const app = express();
-const PORT = 3000;
-
-const cors = require("cors");
-
-require("dotenv").config();
-
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-const userSchema = new mongoose.Schema({
-  uername: String,
-  email: String,
-  password: String,
-});
-
-const User = mongoose.model("User", userSchema);
 
 app.use(express.json());
 app.use(cors());
 
-app.post("/api/signup", async (req, res) => {
-  const { username, email, password } = req.body;
+mongoose.connect("mongodb://127.0.0.1:27017/Users");
 
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new User({
-      username,
-      email,
-      password: hashedPassword,
-    });
-    await newUser.save();
-
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    console.error("Error registering user:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+  UserModel.findOne({ email: email }).then((user) => {
+    if (user) {
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (result) {
+          res.json("Success");
+        } else {
+          res.json("password is incorrect");
+        }
+      });
+    } else {
+      res.json("this email is not registered");
+    }
+  });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.post("/register", (req, res) => {
+  const { username, email, password } = req.body;
+  bcrypt.hash(password, 10, (err, hashedPassword) => {
+    if (err) {
+      res.status(500).json({ error: "Failed to hash password" });
+    } else {
+      UserModel.create({
+        username: username,
+        email: email,
+        password: hashedPassword,
+      })
+        .then((user) => res.json(user))
+        .catch((err) => res.status(400).json({ error: err.message }));
+    }
+  });
+});
+
+app.listen(3000, () => {
+  console.log("server is running");
 });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Style.css";
 
 export default function App() {
@@ -31,6 +31,7 @@ export default function App() {
     updatedTasks.splice(index, 1);
     setTasks(updatedTasks);
   };
+
   return (
     <div className="container">
       <div className="items">
