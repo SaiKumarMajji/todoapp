@@ -23,7 +23,11 @@ export default function Login() {
       })
       .then((result) => {
         console.log(result);
-        if (result.data === "Success") {
+        if (result.data === "Success")
+          localStorage.setItem("userId", result.data.userId);
+
+        console.log("User ID:", result.data.userId);
+        {
           navigate("/todo");
         }
       })

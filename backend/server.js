@@ -2,8 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const UserModel = require("./models/UserModel");
-const TaskModel = require("./models/TaskModel");
+
 const bcrypt = require("bcryptjs");
+const TaskModel = require("./models/TaskModel");
 
 const app = express();
 
@@ -18,7 +19,8 @@ app.post("/login", (req, res) => {
     if (user) {
       bcrypt.compare(password, user.password, (err, result) => {
         if (result) {
-          res.json("Success");
+          // res.json("Success");
+          res.json({ message: "Success", userId: user._id });
         } else {
           res.json("password is incorrect");
         }
