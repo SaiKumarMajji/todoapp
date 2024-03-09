@@ -196,3 +196,19 @@ input {
   color: rgb(17, 127, 230);
   text-decoration: none;
 }
+
+.user-logout {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 100px;
+}
+
+.user-logout button {
+  height: 37px;
+  width: 100px;
+  border-width: 0;
+  color: white;
+  background-color: rgb(81, 81, 226);
+  cursor: pointer;
+}

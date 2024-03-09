@@ -4,6 +4,11 @@ import axios from "axios";
 
 export default function Login() {
   const navigate = useNavigate();
+
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -15,6 +20,7 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("Handle Submit function called");
 
     axios
       .post("http://localhost:3000/login", {
@@ -23,15 +29,26 @@ export default function Login() {
       })
       .then((result) => {
         console.log(result);
-        if (result.data === "Success")
-          localStorage.setItem("userId", result.data.userId);
+        if (result.data.message === "Success") navigate("/todo");
+        localStorage.setItem("userId", result.data.userId);
+        localStorage.setItem("username", result.data.username);
+        console.log("username: ", result.data.username);
 
         console.log("User ID:", result.data.userId);
-        {
-          navigate("/todo");
-        }
       })
-      .catch((err) => console.log(err));
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          const { data } = error.response;
+          if (data === "password is incorrect") {
+            setPasswordError(data);
+          } else if (data === "this email is not registered") {
+            setEmailError(data);
+          } else {
+            setErrorMessage(data);
+          }
+        }
+        console.log("error caught:", error);
+      });
   };
 
   return (
@@ -48,6 +65,7 @@ export default function Login() {
             required
           />{" "}
           <br />
+          <p style={{ color: "red" }}>{emailError}</p>
           <input
             type="password"
             name="password"
@@ -57,8 +75,11 @@ export default function Login() {
             required
           />{" "}
           <br />
+          <p style={{ color: "red" }}>{passwordError}</p>
           <button>Login</button>
+          {errorMessage && <p className="error">{errorMessage}</p>}
         </form>
+
         <p>
           Don't have an account? <Link to="/signup">SignUp</Link>{" "}
         </p>
