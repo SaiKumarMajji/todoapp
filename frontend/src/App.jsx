@@ -9,6 +9,8 @@ export default function App() {
   const [newTask, setNewTask] = useState("");
   const [err, setErr] = useState("");
   const [username, setUsername] = useState("");
+  const [id, setId] = useState();
+  const [updatebtn, setUpdateBtn] = useState(false);
 
   const inputChange = (event) => {
     setNewTask(event.target.value);
@@ -49,14 +51,27 @@ export default function App() {
     }
   };
 
-  // const onEdit = (index) => {
-  //   setNewTask(tasks[index]);
-  //   onDelete(index);
-  // };
-
   const onEdit = (index) => {
     setNewTask(tasks[index].task);
-    onDelete(tasks[index]._id, index);
+
+    setId(tasks[index]._id);
+    setUpdateBtn(true);
+  };
+
+  const ItemUpdate = async () => {
+    try {
+      await axios.put(`http://localhost:3000/tasks/${id}`, {
+        task: newTask,
+      });
+      const updatedTasks = tasks.map((task) =>
+        task._id === id ? { ...task, task: newTask } : task
+      );
+      setTasks(updatedTasks);
+      setNewTask("");
+      setUpdateBtn(false);
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
   };
 
   const onDelete = async (taskId, index) => {
@@ -93,12 +108,18 @@ export default function App() {
           placeholder="Enter a task"
         />
         <p className="err_msg">{err}</p>
-        <button onClick={addItem} className="button_add">
-          Add Task
-        </button>
+        {updatebtn ? (
+          <button onClick={ItemUpdate} className="update-btn">
+            UpdateTask
+          </button>
+        ) : (
+          <button onClick={addItem} className="button_add">
+            Add Task
+          </button>
+        )}
 
         {tasks.map((task, index) => (
-          <div key={task._id} className="tasks">
+          <div key={index} className="tasks">
             <h4>{task.task}</h4>
 
             <div className="task-buttons">
