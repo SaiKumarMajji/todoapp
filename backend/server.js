@@ -14,7 +14,7 @@ app.use(cors());
 require("dotenv").config();
 
 mongoose
-  .connect(process.env.MONGO_URL, {
+  .connect(process.env.MONGO_URL || "mongodb://127.0.0.1:27017/Users",{
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
