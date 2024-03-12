@@ -102,6 +102,7 @@ app.post("/tasks/:userId", async (req, res) => {
     const { userId } = req.params;
     const { task } = req.body;
     const newTask = await TaskModel.create({ task, user: userId });
+
     res.status(201).json({ message: "Task added successfully", task: newTask });
   } catch (error) {
     console.error("Error adding task:", error);
@@ -113,6 +114,7 @@ app.get("/tasks/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     const tasks = await TaskModel.find({ user: userId });
+
     res.json({ tasks });
   } catch (error) {
     console.error("Error fetching tasks:", error);
@@ -130,6 +132,7 @@ app.put("/tasks/:id", async (req, res) => {
       { task },
       { new: true }
     );
+
     res.json(updatedTask);
   } catch (error) {
     res.status(500).json({ error: "Error updating task" });

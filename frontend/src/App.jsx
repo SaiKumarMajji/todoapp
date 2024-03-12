@@ -25,7 +25,9 @@ export default function App() {
   const fetchTasks = async () => {
     try {
       const userId = localStorage.getItem("userId");
-      const response = await axios.get(`http://localhost:3000/tasks/${userId}`);
+      const response = await axios.get(
+        `https://todoapp-backend-nrxj.onrender.com/tasks/${userId}`
+      );
       setTasks(response.data.tasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -38,9 +40,12 @@ export default function App() {
     } else {
       try {
         const userId = localStorage.getItem("userId");
-        await axios.post(`http://localhost:3000/tasks/${userId}`, {
-          task: newTask,
-        });
+        await axios.post(
+          `https://todoapp-backend-nrxj.onrender.com/tasks/${userId}`,
+          {
+            task: newTask,
+          }
+        );
         fetchTasks();
         setTasks([...tasks, newTask]);
         setNewTask("");
@@ -60,7 +65,7 @@ export default function App() {
 
   const ItemUpdate = async () => {
     try {
-      await axios.put(`http://localhost:3000/tasks/${id}`, {
+      await axios.put(`https://todoapp-backend-nrxj.onrender.com/tasks/${id}`, {
         task: newTask,
       });
       const updatedTasks = tasks.map((task) =>
@@ -76,7 +81,9 @@ export default function App() {
 
   const onDelete = async (taskId, index) => {
     try {
-      await axios.delete(`http://localhost:3000/tasks/${taskId}`);
+      await axios.delete(
+        `https://todoapp-backend-nrxj.onrender.com/tasks/${taskId}`
+      );
       const updatedTasks = [...tasks];
       updatedTasks.splice(index, 1);
       setTasks(updatedTasks);
