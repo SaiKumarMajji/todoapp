@@ -64,6 +64,10 @@ export default function App() {
   };
 
   const ItemUpdate = async () => {
+    if (newTask.trim() === "") {
+      setErr("Please add a task for updating.");
+      return; // Stop execution if task is empty
+    }
     try {
       await axios.put(`https://todoapp-backend-nrxj.onrender.com/tasks/${id}`, {
         task: newTask,
@@ -95,13 +99,13 @@ export default function App() {
   const handleLogout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("username");
-    navigate("/login");
+    navigate("/");
   };
 
   return (
     <div className="container">
       <div className="user-logout">
-        <h1 style={{ color: "black" }}>Welcome {username}</h1>
+        <h1 className="username">Welcome {username}</h1>
         <button onClick={handleLogout}>Logout</button>
       </div>
 
