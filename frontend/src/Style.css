@@ -82,6 +82,7 @@
   height: 35px;
   margin-top: 10px;
   padding-left: 10px;
+  padding-right: 30px;
 }
 
 .login-container h1 {
@@ -170,6 +171,7 @@
   height: 37px;
   margin-top: 10px;
   padding-left: 10px;
+  padding-right: 30px;
 }
 .signup p {
   margin-top: 18px;
@@ -341,6 +343,7 @@ input {
     height: 40px;
     margin-top: 12px;
     padding-left: 10px;
+    padding-right: 38px;
   }
 
   .login-container h1 {
@@ -424,6 +427,7 @@ input {
     height: 42px;
     margin-top: 12px;
     padding-left: 10px;
+    padding-right: 38px;
   }
 
   .container {
@@ -672,6 +676,7 @@ input {
     width: 350px;
     outline: 0;
     height: 40px;
+    padding-right: 40px;
   }
   .signup p {
     margin-top: 18px;
@@ -703,6 +708,7 @@ input {
     width: 350px;
     outline: 0;
     height: 40px;
+    padding-right: 40px;
   }
 
   .login-container h1 {
