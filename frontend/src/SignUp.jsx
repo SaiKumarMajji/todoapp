@@ -32,11 +32,16 @@ export default function SignUp() {
     e.preventDefault();
 
     axios
-      .post("http://localhost:3000/register", {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-      })
+      .post(
+        `https://todoapp-backend-nrxj.onrender.com
+
+/register`,
+        {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }
+      )
       .then((result) => {
         console.log(result);
         navigate("/login");

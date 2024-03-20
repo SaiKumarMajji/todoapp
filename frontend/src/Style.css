@@ -113,10 +113,6 @@
   text-decoration: none;
 }
 
-.pass-change input {
-  height: 40px;
-}
-
 .password-container {
   position: relative;
 }
@@ -369,6 +365,10 @@ input {
   .otp-input {
     margin-bottom: 10px;
     height: 40px;
+  }
+
+  .password-input-container {
+    height: 60px;
   }
 
   .eye-on-off-icon {

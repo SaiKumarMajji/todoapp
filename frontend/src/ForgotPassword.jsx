@@ -183,13 +183,13 @@ export default function ForgotPassword() {
                 onChange={handleOtpChange}
               />
               {expiryTime > 0 && (
-                <div style={{ paddingLeft: "24px", color: "red" }}>
+                <div style={{ paddingLeft: "25px", color: "red" }}>
                   Expires in {expiryTime} seconds
                 </div>
               )}
 
               {otpError && (
-                <div style={{ paddingLeft: "24px", color: "red" }}>
+                <div style={{ paddingLeft: "25px", color: "red" }}>
                   {otpError}
                 </div>
               )}
@@ -218,13 +218,15 @@ export default function ForgotPassword() {
                       className="eye-on-off-icon"
                     />
                   )}
+
                   {passwordErr && (
-                    <div style={{ paddingLeft: "24px", color: "red" }}>
+                    <div style={{ paddingLeft: "25px", color: "red" }}>
                       {passwordErr}
                     </div>
                   )}
+
                   {specialCharErr && (
-                    <div style={{ paddingLeft: "24px", color: "red" }}>
+                    <div style={{ paddingLeft: "25px", color: "red" }}>
                       {specialCharErr}
                     </div>
                   )}
@@ -251,18 +253,20 @@ export default function ForgotPassword() {
                       className="eye-on-off-icon"
                     />
                   )}
+
                   {confirmPasswordErr && (
-                    <div style={{ paddingLeft: "24px", color: "red" }}>
+                    <div style={{ paddingLeft: "25px", color: "red" }}>
                       {confirmPasswordErr}
                     </div>
                   )}
+
                   {passwordMatchError && (
-                    <div style={{ paddingLeft: "24px", color: "red" }}>
+                    <div style={{ paddingLeft: "25px", color: "red" }}>
                       {passwordMatchError}
                     </div>
                   )}
                   {specialCharErr && (
-                    <div style={{ paddingLeft: "24px", color: "red" }}>
+                    <div style={{ paddingLeft: "25px", color: "red" }}>
                       {specialCharErr}
                     </div>
                   )}
@@ -274,7 +278,7 @@ export default function ForgotPassword() {
           )}
         </div>
         {emailError && (
-          <span style={{ paddingLeft: "24px", color: "red" }}>
+          <span style={{ paddingLeft: "25px", color: "red" }}>
             {emailError}
           </span>
         )}

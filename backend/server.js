@@ -155,8 +155,8 @@ app.delete("/tasks/:taskId", async (req, res) => {
 const transporter = nodemailer.createTransport({
   service: "Gmail", // e.g., Gmail
   auth: {
-    user: "msksaikumar99@gmail.com",
-    pass: "dvjh dkmg hayq qfic",
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
@@ -184,7 +184,7 @@ app.post("/send-otp", async (req, res) => {
       from: "noreply@gmail.com",
       to: email,
       subject: "OTP for Verification",
-      text: `Your OTP for verification is: ${otp}`,
+      text: `Your OTP for Password reset is: ${otp}`,
     };
 
     // Send email
