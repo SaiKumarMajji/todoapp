@@ -18,12 +18,62 @@
 .login {
   background-color: white;
   border-radius: 10px;
-  height: 300px;
+  height: 330px;
   width: 310px;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 10px;
+}
+
+.forgot {
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 10px;
+  padding-left: 26px;
+  color: rgb(17, 127, 230);
+}
+
+.reset-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.reset-page input {
+  width: 280px;
+  outline: none;
+
+  padding-right: 30px;
+}
+
+.password-input-container,
+.confirm-password-input-container {
+  position: relative;
+}
+.pass-change .eye-on-off-icon {
+  position: absolute;
+  top: 30px;
+
+  right: 30px;
+
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.reset-page button {
+  display: block;
+  width: 280px;
+  margin-top: 10px;
+  margin-left: 25px;
+  background-color: rgb(55, 82, 202);
+  color: white;
+  border-width: 0;
+  font-size: 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  height: 32px;
 }
 
 .login input {
@@ -63,13 +113,17 @@
   text-decoration: none;
 }
 
+.pass-change input {
+  height: 40px;
+}
+
 .password-container {
   position: relative;
 }
 
 .eye-on-off-icon {
   position: absolute;
-  top: 20px;
+  top: 24px;
 
   right: 30px;
 
@@ -88,7 +142,7 @@
 .signup {
   background-color: white;
   border-radius: 10px;
-  height: 340px;
+  height: 360px;
   width: 310px;
   display: flex;
   flex-direction: column;
@@ -277,7 +331,7 @@ input {
   .login {
     background-color: white;
     border-radius: 10px;
-    height: 350px;
+    height: 360px;
     width: 380px;
     display: flex;
     flex-direction: column;
@@ -288,7 +342,7 @@ input {
   .login input {
     width: 320px;
     outline: 0;
-    height: 42px;
+    height: 40px;
     margin-top: 12px;
     padding-left: 10px;
   }
@@ -312,9 +366,9 @@ input {
     border-radius: 5px;
     cursor: pointer;
   }
-
-  .password-container {
-    position: relative;
+  .otp-input {
+    margin-bottom: 10px;
+    height: 40px;
   }
 
   .eye-on-off-icon {
@@ -338,7 +392,7 @@ input {
   .signup {
     background-color: white;
     border-radius: 10px;
-    height: 350px;
+    height: 360px;
     width: 380px;
     display: flex;
     flex-direction: column;

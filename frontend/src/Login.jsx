@@ -31,7 +31,7 @@ export default function Login() {
     e.preventDefault();
 
     axios
-      .post("https://todoapp-backend-nrxj.onrender.com/login", {
+      .post("http://localhost:3000/login", {
         email: formData.email,
         password: formData.password,
       })
@@ -104,6 +104,9 @@ export default function Login() {
           </div>
 
           <button>Login</button>
+          <Link to="/resetPassword" className="forgot">
+            Forgot Password?
+          </Link>
         </form>
 
         <p>

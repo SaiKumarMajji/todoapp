@@ -2,7 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const UserModel = require("./models/UserModel");
+const nodemailer = require("nodemailer");
 
+const OtpModel = require("./models/OtpModel");
 const bcrypt = require("bcryptjs");
 const TaskModel = require("./models/TaskModel");
 
@@ -146,6 +148,105 @@ app.delete("/tasks/:taskId", async (req, res) => {
     res.status(200).json({ message: "Task deleted successfully" });
   } catch (error) {
     console.error("Error deleting task:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+const transporter = nodemailer.createTransport({
+  service: "Gmail", // e.g., Gmail
+  auth: {
+    user: "msksaikumar99@gmail.com",
+    pass: "dvjh dkmg hayq qfic",
+  },
+});
+
+// Endpoint to send OTP
+app.post("/send-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if email exists in the database
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "Email is not registered" });
+    }
+
+    // Generate OTP
+    const generateOTP = () => {
+      return Math.floor(1000 + Math.random() * 9000);
+    };
+    const otp = generateOTP();
+    // Save OTP to the database
+    await OtpModel.create({ email, otp });
+
+    // Compose email
+    const mailOptions = {
+      from: "noreply@gmail.com",
+      to: email,
+      subject: "OTP for Verification",
+      text: `Your OTP for verification is: ${otp}`,
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending OTP email:", error);
+        res.status(500).json({ error: "Failed to send OTP" });
+      } else {
+        console.log("Email sent:", info.response);
+        res.status(200).json({ message: "OTP sent successfully" });
+      }
+    });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/verify-otp", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    // Retrieve OTP from the database
+    const storedOTP = await OtpModel.findOne({ email });
+    console.log("Stored OTP:", storedOTP);
+    if (!storedOTP) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    // Compare OTP
+    console.log("Entered OTP:", otp);
+    if (parseInt(otp) !== storedOTP.otp) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    // OTP verification successful
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/reset-password", async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    // Check if password contains at least one special character
+    const specialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+    if (!specialChars.test(newPassword)) {
+      return res.status(400).json({
+        error: "one special character required",
+      });
+    }
+
+    // Update user's password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await UserModel.findOneAndUpdate({ email }, { password: hashedPassword });
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Error resetting password:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
