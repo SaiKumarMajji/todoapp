@@ -88,6 +88,7 @@ export default function Login() {
           </div>
           <div className="password-container">
             <input
+              className="login-inp-pass"
               type={type}
               name="password"
               placeholder="Password"

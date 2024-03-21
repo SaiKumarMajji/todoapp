@@ -103,6 +103,7 @@ export default function SignUp() {
           </div>
           <div className="password-container">
             <input
+              className="signup-inp-pass"
               type={type}
               name="password"
               placeholder="Create Password"

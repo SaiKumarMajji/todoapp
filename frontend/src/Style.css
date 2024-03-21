@@ -82,6 +82,9 @@
   height: 35px;
   margin-top: 10px;
   padding-left: 10px;
+}
+
+.login-inp-pass {
   padding-right: 30px;
 }
 
@@ -171,8 +174,12 @@
   height: 37px;
   margin-top: 10px;
   padding-left: 10px;
+}
+
+.signup-inp-pass {
   padding-right: 30px;
 }
+
 .signup p {
   margin-top: 18px;
 }
@@ -343,6 +350,9 @@ input {
     height: 40px;
     margin-top: 12px;
     padding-left: 10px;
+  }
+
+  .login-inp-pass {
     padding-right: 38px;
   }
 
@@ -427,6 +437,9 @@ input {
     height: 42px;
     margin-top: 12px;
     padding-left: 10px;
+  }
+
+  .signup-inp-pass {
     padding-right: 38px;
   }
 
@@ -676,6 +689,9 @@ input {
     width: 350px;
     outline: 0;
     height: 40px;
+  }
+
+  .signup-inp-pass {
     padding-right: 40px;
   }
   .signup p {
@@ -708,6 +724,9 @@ input {
     width: 350px;
     outline: 0;
     height: 40px;
+  }
+
+  .login-inp-pass {
     padding-right: 40px;
   }
 
