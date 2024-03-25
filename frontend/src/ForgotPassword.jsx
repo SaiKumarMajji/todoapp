@@ -83,9 +83,12 @@ export default function ForgotPassword() {
         return;
       }
       setEmailError(""); // Clear previous error message
-      const response = await axios.post(`http://localhost:3000/send-otp`, {
-        email,
-      });
+      const response = await axios.post(
+        `https://todoapp-backend-nrxj.onrender.com/send-otp`,
+        {
+          email,
+        }
+      );
       setOtpSent(true);
     } catch (error) {
       console.error("Error sending OTP:", error);
@@ -105,10 +108,13 @@ export default function ForgotPassword() {
         return;
       }
       setOtpError("");
-      const response = await axios.post(`http://localhost:3000/verify-otp`, {
-        email,
-        otp,
-      });
+      const response = await axios.post(
+        `https://todoapp-backend-nrxj.onrender.com/verify-otp`,
+        {
+          email,
+          otp,
+        }
+      );
       if (response.status === 200) {
         setOtpVerified(true);
       } else {
@@ -143,7 +149,7 @@ export default function ForgotPassword() {
       }
 
       const response = await axios.post(
-        `http://localhost:3000/reset-password`,
+        `https://todoapp-backend-nrxj.onrender.com/reset-password`,
         {
           email,
           newPassword: password,
@@ -168,9 +174,12 @@ export default function ForgotPassword() {
 
   const handleResendOTP = async () => {
     try {
-      const response = await axios.post(`http://localhost:3000/send-otp`, {
-        email,
-      });
+      const response = await axios.post(
+        `https://todoapp-backend-nrxj.onrender.com/send-otp`,
+        {
+          email,
+        }
+      );
       setOtpSent(true);
       setOtpExpired(false);
       setExpiryTime(300); // Reset the expiry timer

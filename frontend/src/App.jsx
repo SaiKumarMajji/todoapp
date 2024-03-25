@@ -25,7 +25,8 @@ export default function App() {
   const fetchTasks = async () => {
     try {
       const userId = localStorage.getItem("userId");
-      const response = await axios.get(`http://localhost:3000
+      const response =
+        await axios.get(`https://todoapp-backend-nrxj.onrender.com
 
 /tasks/${userId}`);
       setTasks(response.data.tasks);
@@ -41,7 +42,7 @@ export default function App() {
       try {
         const userId = localStorage.getItem("userId");
         await axios.post(
-          `http://localhost:3000
+          `https://todoapp-backend-nrxj.onrender.com
 
 /tasks/${userId}`,
           {
@@ -72,7 +73,7 @@ export default function App() {
     }
     try {
       await axios.put(
-        `http://localhost:3000
+        `https://todoapp-backend-nrxj.onrender.com
 
 /tasks/${id}`,
         {
@@ -92,7 +93,7 @@ export default function App() {
 
   const onDelete = async (taskId, index) => {
     try {
-      await axios.delete(`http://localhost:3000
+      await axios.delete(`https://todoapp-backend-nrxj.onrender.com
 
 /tasks/${taskId}`);
       const updatedTasks = [...tasks];

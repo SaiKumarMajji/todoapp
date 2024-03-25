@@ -33,7 +33,7 @@ export default function SignUp() {
 
     axios
       .post(
-        `http://localhost:3000
+        `https://todoapp-backend-nrxj.onrender.com
 
 /register`,
         {
