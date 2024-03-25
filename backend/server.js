@@ -64,7 +64,7 @@ app.post("/register", async (req, res) => {
     const specialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
     if (!specialChars.test(password)) {
       return res.status(400).json({
-        error: "Password must contain one special character",
+        error: "  one special character required ",
       });
     }
     // Check if username already exists

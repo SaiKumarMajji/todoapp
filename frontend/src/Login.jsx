@@ -32,7 +32,7 @@ export default function Login() {
 
     axios
       .post(
-        `https://todoapp-backend-nrxj.onrender.com
+        `http://localhost:3000
 
 /login`,
         {
@@ -71,7 +71,7 @@ export default function Login() {
       <div className="login">
         <h1>Login</h1>
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className="login-input-container">
             <input
               type="email"
               name="email"
@@ -81,12 +81,15 @@ export default function Login() {
               required
             />
             {emailError && (
-              <p style={{ color: "red", marginLeft: "25px", marginTop: "0px" }}>
+              <p
+                className="login-error-message"
+                style={{ color: "red", marginLeft: "25px" }}
+              >
                 {emailError}
               </p>
             )}
           </div>
-          <div className="password-container">
+          <div className="login-password-container">
             <input
               className="login-inp-pass"
               type={type}
@@ -98,12 +101,21 @@ export default function Login() {
             />
 
             {type === "password" ? (
-              <IoMdEyeOff onClick={handleToggle} className="eye-on-off-icon" />
+              <IoMdEyeOff
+                onClick={handleToggle}
+                className="eye-on-off-icon-login"
+              />
             ) : (
-              <IoMdEye onClick={handleToggle} className="eye-on-off-icon" />
+              <IoMdEye
+                onClick={handleToggle}
+                className="eye-on-off-icon-login"
+              />
             )}
             {passwordError && (
-              <p style={{ color: "red", marginLeft: "25px", marginTop: "0px" }}>
+              <p
+                className="login-error-message"
+                style={{ color: "red", marginLeft: "25px" }}
+              >
                 {passwordError}
               </p>
             )}

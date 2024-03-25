@@ -33,7 +33,7 @@ export default function SignUp() {
 
     axios
       .post(
-        `https://todoapp-backend-nrxj.onrender.com
+        `http://localhost:3000
 
 /register`,
         {
@@ -44,7 +44,7 @@ export default function SignUp() {
       )
       .then((result) => {
         console.log(result);
-        navigate("/login");
+        navigate("/");
       })
       .catch((err) => {
         if (err.response) {
@@ -55,7 +55,7 @@ export default function SignUp() {
             newErrors.username = data.error;
           } else if (data.error.includes("Email")) {
             newErrors.email = data.error;
-          } else if (data.error.includes("Password")) {
+          } else if (data.error.includes("one")) {
             newErrors.password = data.error;
           }
 
@@ -71,7 +71,7 @@ export default function SignUp() {
       <div className="signup">
         <h1>SignUp</h1>
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className="input-container">
             <input
               type="text"
               placeholder="Enter Username"
@@ -81,12 +81,15 @@ export default function SignUp() {
               required
             />
             {errors.username && (
-              <p style={{ color: "red", marginLeft: "25px", marginTop: "0px" }}>
+              <p
+                className="error-message"
+                style={{ color: "red", marginLeft: "25px" }}
+              >
                 {errors.username}
               </p>
             )}
           </div>
-          <div>
+          <div className="input-container">
             <input
               type="email"
               name="email"
@@ -96,7 +99,10 @@ export default function SignUp() {
               required
             />
             {errors.email && (
-              <p style={{ color: "red", marginLeft: "25px", marginTop: "0px" }}>
+              <p
+                className="signup-error-message"
+                style={{ color: "red", marginLeft: "25px" }}
+              >
                 {errors.email}
               </p>
             )}
@@ -112,15 +118,24 @@ export default function SignUp() {
               required
             />
             {errors.password && (
-              <p style={{ color: "red", marginLeft: "25px", marginTop: "0px" }}>
+              <p
+                className="error-message"
+                style={{ color: "red", marginLeft: "25px" }}
+              >
                 {errors.password}
               </p>
             )}
 
             {type === "password" ? (
-              <IoMdEyeOff onClick={handleToggle} className="eye-on-off-icon" />
+              <IoMdEyeOff
+                onClick={handleToggle}
+                className="eye-on-off-icon-signup"
+              />
             ) : (
-              <IoMdEye onClick={handleToggle} className="eye-on-off-icon" />
+              <IoMdEye
+                onClick={handleToggle}
+                className="eye-on-off-icon-signup"
+              />
             )}
           </div>
 

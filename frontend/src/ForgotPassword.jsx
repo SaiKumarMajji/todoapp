@@ -17,6 +17,7 @@ export default function ForgotPassword() {
   const [passwordType, setPasswordType] = useState("password");
   const [confirmPasswordType, setConfirmPasswordType] = useState("password");
   const [specialCharErr, setSpecialCharErr] = useState("");
+  const [otpExpired, setOtpExpired] = useState(false);
   const handleTogglePassword = () => {
     if (passwordType === "password") {
       setPasswordType("text");
@@ -24,6 +25,23 @@ export default function ForgotPassword() {
       setPasswordType("password");
     }
   };
+  useEffect(() => {
+    // Start the countdown timer when OTP is sent
+    if (otpSent) {
+      const timer = setInterval(() => {
+        setExpiryTime((prevExpiryTime) => {
+          const newExpiryTime = prevExpiryTime - 1;
+          if (newExpiryTime === 0) {
+            setOtpExpired(true);
+          }
+          return newExpiryTime;
+        });
+      }, 1000);
+
+      // Clear the timer when the component unmounts, OTP is verified, or the timer reaches 0
+      return () => clearInterval(timer);
+    }
+  }, [otpSent]);
 
   const handleToggleConfirmPassword = () => {
     if (confirmPasswordType === "password") {
@@ -57,18 +75,6 @@ export default function ForgotPassword() {
     setSpecialCharErr("");
   };
 
-  useEffect(() => {
-    // Start the countdown timer when OTP is sent
-    if (otpSent) {
-      const timer = setInterval(() => {
-        setExpiryTime((prevExpiryTime) => prevExpiryTime - 1);
-      }, 1000);
-
-      // Clear the timer when the component unmounts, OTP is verified, or the timer reaches 0
-      return () => clearInterval(timer);
-    }
-  }, [otpSent]);
-
   const handleSendOTP = async (event) => {
     event.preventDefault();
     try {
@@ -77,12 +83,9 @@ export default function ForgotPassword() {
         return;
       }
       setEmailError(""); // Clear previous error message
-      const response = await axios.post(
-        `https://todoapp-backend-nrxj.onrender.com/send-otp`,
-        {
-          email,
-        }
-      );
+      const response = await axios.post(`http://localhost:3000/send-otp`, {
+        email,
+      });
       setOtpSent(true);
     } catch (error) {
       console.error("Error sending OTP:", error);
@@ -102,13 +105,10 @@ export default function ForgotPassword() {
         return;
       }
       setOtpError("");
-      const response = await axios.post(
-        `https://todoapp-backend-nrxj.onrender.com/verify-otp`,
-        {
-          email,
-          otp,
-        }
-      );
+      const response = await axios.post(`http://localhost:3000/verify-otp`, {
+        email,
+        otp,
+      });
       if (response.status === 200) {
         setOtpVerified(true);
       } else {
@@ -143,7 +143,7 @@ export default function ForgotPassword() {
       }
 
       const response = await axios.post(
-        `https://todoapp-backend-nrxj.onrender.com/reset-password`,
+        `http://localhost:3000/reset-password`,
         {
           email,
           newPassword: password,
@@ -166,6 +166,24 @@ export default function ForgotPassword() {
     }
   };
 
+  const handleResendOTP = async () => {
+    try {
+      const response = await axios.post(`http://localhost:3000/send-otp`, {
+        email,
+      });
+      setOtpSent(true);
+      setOtpExpired(false);
+      setExpiryTime(300); // Reset the expiry timer
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      if (error.response && error.response.data && error.response.data.error) {
+        setEmailError(error.response.data.error);
+      } else {
+        setEmailError("An error occurred while sending OTP");
+      }
+    }
+  };
+
   return (
     <div className="reset-page">
       <form onSubmit={handleResetPassword}>
@@ -179,7 +197,7 @@ export default function ForgotPassword() {
               onChange={handleEmailChange}
             />
           ) : !otpVerified ? (
-            <div>
+            <div className="otp-container">
               <input
                 className="otp-input"
                 name="otp"
@@ -191,6 +209,20 @@ export default function ForgotPassword() {
               {expiryTime > 0 && (
                 <div style={{ paddingLeft: "25px", color: "red" }}>
                   Expires in {expiryTime} seconds
+                </div>
+              )}
+
+              {otpExpired && (
+                <div
+                  style={{
+                    paddingLeft: "25px",
+                    color: "rgb(55, 82, 202)",
+
+                    cursor: "pointer",
+                  }}
+                  onClick={handleResendOTP}
+                >
+                  Resend OTP
                 </div>
               )}
 
