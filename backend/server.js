@@ -1,3 +1,6 @@
+const dns = require("node:dns");
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -7,11 +10,22 @@ const nodemailer = require("nodemailer");
 const OtpModel = require("./models/OtpModel");
 const bcrypt = require("bcryptjs");
 const TaskModel = require("./models/TaskModel");
+const { setTokenCookie } = require("./utils/setCookie");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+const { protect } = require("./middleware/authMiddleware");
+
 
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL, 
+    credentials: true,             
+  })
+);
 
 require("dotenv").config();
 
@@ -29,33 +43,33 @@ mongoose
 
 // mongoose.connect("mongodb://127.0.0.1:27017/Users");
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  UserModel.findOne({ email: email })
-    .then((user) => {
-      if (user) {
-        bcrypt.compare(password, user.password, (err, result) => {
-          if (result) {
-            // res.json("Success");
-            res.json({
-              message: "Success",
-              userId: user._id,
-              username: user.username,
-            });
-          } else {
-            // res.json("password is incorrect");
-            res.status(401).json({ error: "Password is incorrect" });
-          }
-        });
-      } else {
-        // res.json("this email is not registered");
-        res.status(404).json({ error: "Email is not registered" });
-      }
-    })
-    .catch((error) => {
-      console.error("Error logging in:", error);
-      res.status(500).json({ error: "Internal server error" }); // Internal Server Error status code
+  try {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      // generic message to prevent enumeration
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || "7d",
     });
+    setTokenCookie(res, token);
+
+    res.json({
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 app.post("/register", async (req, res) => {
@@ -63,48 +77,47 @@ app.post("/register", async (req, res) => {
   try {
     const specialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
     if (!specialChars.test(password)) {
-      return res.status(400).json({
-        error: "  one special character required ",
-      });
+      return res.status(400).json({ error: "One special character required" });
     }
-    // Check if username already exists
-    const existingUsername = await UserModel.findOne({ username });
-    if (existingUsername) {
+    if (await UserModel.findOne({ username })) {
       return res.status(400).json({ error: "Username already taken" });
     }
-
-    // Check if email already registered
-    const existingEmail = await UserModel.findOne({ email });
-    if (existingEmail) {
+    if (await UserModel.findOne({ email })) {
       return res.status(400).json({ error: "Email already in use" });
     }
 
-    // Hash password and create new user
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) {
-        return res.status(500).json({ error: "Failed to hash password" });
-      } else {
-        UserModel.create({
-          username: username,
-          email: email,
-          password: hashedPassword,
-        })
-          .then((user) => res.status(201).json(user))
-          .catch((err) => res.status(400).json({ error: err.message }));
-      }
+    const hashed = await bcrypt.hash(password, 10);
+    const user = await UserModel.create({
+      username,
+      email,
+      password: hashed,
+    });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+    });
+    setTokenCookie(res, token);
+
+    // return safe user data — never the password
+    res.status(201).json({
+      userId: user._id,
+      username: user.username,
+      email: user.email,
     });
   } catch (error) {
-    console.error("Error registering user:", error);
+    console.error("Register error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-app.post("/tasks/:userId", async (req, res) => {
+// CREATE a task — identity comes from the cookie, not the URL
+app.post("/tasks", protect, async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { task } = req.body;
-    const newTask = await TaskModel.create({ task, user: userId });
-
+    const newTask = await TaskModel.create({
+      task: req.body.task,
+      user: req.user._id,   // derived from JWT, cannot be spoofed
+      completed: false,
+    });
     res.status(201).json({ message: "Task added successfully", task: newTask });
   } catch (error) {
     console.error("Error adding task:", error);
@@ -112,11 +125,10 @@ app.post("/tasks/:userId", async (req, res) => {
   }
 });
 
-app.get("/tasks/:userId", async (req, res) => {
+// READ all tasks belonging to the logged-in user
+app.get("/tasks", protect, async (req, res) => {
   try {
-    const { userId } = req.params;
-    const tasks = await TaskModel.find({ user: userId });
-
+    const tasks = await TaskModel.find({ user: req.user._id });
     res.json({ tasks });
   } catch (error) {
     console.error("Error fetching tasks:", error);
@@ -124,32 +136,57 @@ app.get("/tasks/:userId", async (req, res) => {
   }
 });
 
-app.put("/tasks/:id", async (req, res) => {
-  const { id } = req.params;
-  const { task } = req.body;
-
+// UPDATE — only if the task belongs to the logged-in user
+app.put("/tasks/:id", protect, async (req, res) => {
   try {
-    const updatedTask = await TaskModel.findByIdAndUpdate(
-      id,
-      { task },
+    const updated = await TaskModel.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id }, // ownership enforced in the filter
+      { task: req.body.task },
       { new: true }
     );
-
-    res.json(updatedTask);
+    if (!updated) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+    res.json(updated);
   } catch (error) {
-    res.status(500).json({ error: "Error updating task" });
+    console.error("Error updating task:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-app.delete("/tasks/:taskId", async (req, res) => {
+// DELETE — only if the task belongs to the logged-in user
+app.delete("/tasks/:taskId", protect, async (req, res) => {
   try {
-    const { taskId } = req.params;
-    await TaskModel.findByIdAndDelete(taskId);
+    const deleted = await TaskModel.findOneAndDelete({
+      _id: req.params.taskId,
+      user: req.user._id,
+    });
+    if (!deleted) {
+      return res.status(404).json({ error: "Task not found" });
+    }
     res.status(200).json({ message: "Task deleted successfully" });
   } catch (error) {
     console.error("Error deleting task:", error);
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+
+app.get("/me", protect, (req, res) => {
+  res.json({
+    userId: req.user._id,
+    username: req.user.username,
+    email: req.user.email,
+  });
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
+  res.json({ message: "Logged out" });
 });
 
 const transporter = nodemailer.createTransport({

@@ -5,7 +5,7 @@ import axios from "axios";
 
 export default function App() {
   const navigate = useNavigate();
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState([{ completed: false }]);
   const [newTask, setNewTask] = useState("");
   const [err, setErr] = useState("");
   const [username, setUsername] = useState("");
@@ -110,6 +110,30 @@ export default function App() {
     navigate("/");
   };
 
+  //   const toggleTaskCompletion = async (taskId, completed) => {
+  //     try {
+  //       await axios.post(
+  //         `https://todoapp-backend-nrxj.onrender.com
+
+  // /tasks/${taskId}`,
+  //         {
+  //           completed: !completed,
+  //         }
+  //       );
+
+  //       fetchTasks();
+  //     } catch (error) {
+  //       console.error("Error updating task completion", error);
+  //     }
+  //   };
+
+  const toggleTaskCompletion = (index) => {
+    const updatedTasks = tasks.map((task, i) =>
+      i === index ? { ...task, completed: !task.completed } : task
+    );
+    setTasks(updatedTasks);
+  };
+
   return (
     <div className="container">
       <div className="user-logout">
@@ -139,7 +163,17 @@ export default function App() {
 
         {tasks.map((task, index) => (
           <div key={index} className="tasks">
-            <h4>{task.task}</h4>
+            <input
+              type="checkbox"
+              onChange={() => toggleTaskCompletion(index)}
+            />
+            <h4
+              style={{
+                textDecoration: task.completed ? "line-through" : "none",
+              }}
+            >
+              {task.task}
+            </h4>
 
             <div className="task-buttons">
               <button onClick={() => onEdit(index)}>Edit</button>
