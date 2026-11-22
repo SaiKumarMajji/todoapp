@@ -18,7 +18,11 @@ export default function SignUp() {
     }
     setPending(true);
     try {
-      await api.post("/register", { username: username.trim(), email: email.trim(), password });
+      await api.post(
+        "/register",
+        { username: username.trim(), email: email.trim(), password },
+        { withCredentials: false },
+      );
       navigate("/login", { replace: true, state: { notice: "Account created. Sign in to get started." } });
     } catch (error) {
       setError(errorMessage(error, "Couldn’t create your account. Please try again."));
