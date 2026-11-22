@@ -1,6 +1,8 @@
 const dns = require("node:dns");
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -27,7 +29,6 @@ app.use(
   })
 );
 
-require("dotenv").config();
 
 mongoose
   .connect(process.env.MONGO_URL, {
