@@ -1,136 +1,45 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+import { useState } from "react";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { api, errorMessage } from "./api";
+import { AuthLayout, Field, FormError, PasswordField } from "./Layout";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [type, setType] = useState("password");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  if (localStorage.getItem("userId")) return <Navigate to="/todo" replace />;
 
-  const handleToggle = () => {
-    if (type === "password") {
-      setType("text");
-    } else {
-      setType("password");
+  async function submit(event) {
+    event.preventDefault();
+    const { email, password } = Object.fromEntries(new FormData(event.currentTarget));
+    setError("");
+    setPending(true);
+    try {
+      const { data } = await api.post("/login", { email: email.trim(), password });
+      if (!data.userId) throw new Error("Missing user ID");
+      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("username", data.username || "");
+      navigate("/todo", { replace: true });
+    } catch (error) {
+      setError(errorMessage(error, "Couldn’t sign in. Please try again."));
+    } finally {
+      setPending(false);
     }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    axios
-      .post(
-        `https://todoapp-backend-nrxj.onrender.com
-
-/login`,
-        {
-          email: formData.email,
-          password: formData.password,
-        }
-      )
-      .then((result) => {
-        console.log(result);
-        if (result.data.message === "Success") navigate("/todo");
-        localStorage.setItem("userId", result.data.userId);
-        localStorage.setItem("username", result.data.username);
-        console.log("username: ", result.data.username);
-
-        console.log("User ID:", result.data.userId);
-      })
-      .catch((error) => {
-        console.log("error caught:", error);
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.error
-        ) {
-          const errorMessage = error.response.data.error;
-          if (errorMessage.includes("Email")) {
-            setEmailError(errorMessage);
-          } else if (errorMessage.includes("Password")) {
-            setPasswordError(errorMessage);
-          }
-        }
-      });
-  };
+  }
 
   return (
-    <div className="login-container">
-      <div className="login">
-        <h1>Login</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="login-input-container">
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-            {emailError && (
-              <p
-                className="login-error-message"
-                style={{ color: "red", marginLeft: "25px" }}
-              >
-                {emailError}
-              </p>
-            )}
-          </div>
-          <div className="login-password-container">
-            <input
-              className="login-inp-pass"
-              type={type}
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-
-            {type === "password" ? (
-              <IoMdEyeOff
-                onClick={handleToggle}
-                className="eye-on-off-icon-login"
-              />
-            ) : (
-              <IoMdEye
-                onClick={handleToggle}
-                className="eye-on-off-icon-login"
-              />
-            )}
-            {passwordError && (
-              <p
-                className="login-error-message"
-                style={{ color: "red", marginLeft: "25px" }}
-              >
-                {passwordError}
-              </p>
-            )}
-          </div>
-
-          <button>Login</button>
-          <Link to="/resetPassword" className="forgot">
-            Forgot Password?
-          </Link>
-        </form>
-
-        <p>
-          Don't have an account? <Link to="/signup">SignUp</Link>{" "}
-        </p>
-      </div>
-    </div>
+    <AuthLayout title="Welcome back" description="Sign in to open your task list.">
+      {state?.notice && <p className="notice" role="status">{state.notice}</p>}
+      <form className="auth-form" onSubmit={submit}>
+        <Field id="email" name="email" label="Email address" type="email" autoComplete="email" required />
+        <PasswordField id="password" autoComplete="current-password" />
+        <Link className="form-link" to="/resetPassword">Forgot password?</Link>
+        <FormError message={error} />
+        <button className="button button-primary" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</button>
+      </form>
+      <p className="auth-footer">New to TodoApp? <Link to="/signup">Create an account</Link></p>
+    </AuthLayout>
   );
 }
