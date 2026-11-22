@@ -1,150 +1,42 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+import { api, errorMessage } from "./api";
+import { AuthLayout, Field, FormError, PasswordField } from "./Layout";
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
 
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
-  const [errors, setErrors] = useState({});
-
-  const [type, setType] = useState("password");
-
-  const handleToggle = () => {
-    if (type === "password") {
-      setType("text");
-    } else {
-      setType("password");
+  async function submit(event) {
+    event.preventDefault();
+    const { username, email, password } = Object.fromEntries(new FormData(event.currentTarget));
+    setError("");
+    if (!username.trim()) {
+      setError("Enter a username.");
+      return;
     }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    axios
-      .post(
-        `https://todoapp-backend-nrxj.onrender.com
-
-/register`,
-        {
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }
-      )
-      .then((result) => {
-        console.log(result);
-        navigate("/");
-      })
-      .catch((err) => {
-        if (err.response) {
-          const { data } = err.response;
-          const newErrors = { ...errors };
-
-          if (data.error.includes("Username")) {
-            newErrors.username = data.error;
-          } else if (data.error.includes("Email")) {
-            newErrors.email = data.error;
-          } else if (data.error.includes("one")) {
-            newErrors.password = data.error;
-          }
-
-          setErrors(newErrors);
-        } else {
-          console.log(err);
-        }
-      });
-  };
+    setPending(true);
+    try {
+      await api.post("/register", { username: username.trim(), email: email.trim(), password });
+      navigate("/login", { replace: true, state: { notice: "Account created. Sign in to get started." } });
+    } catch (error) {
+      setError(errorMessage(error, "Couldn’t create your account. Please try again."));
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
-    <div className="signup-container">
-      <div className="signup">
-        <h1>SignUp</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="input-container">
-            <input
-              type="text"
-              placeholder="Enter Username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
-            {errors.username && (
-              <p
-                className="error-message"
-                style={{ color: "red", marginLeft: "25px" }}
-              >
-                {errors.username}
-              </p>
-            )}
-          </div>
-          <div className="input-container">
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-            {errors.email && (
-              <p
-                className="signup-error-message"
-                style={{ color: "red", marginLeft: "25px" }}
-              >
-                {errors.email}
-              </p>
-            )}
-          </div>
-          <div className="password-container">
-            <input
-              className="signup-inp-pass"
-              type={type}
-              name="password"
-              placeholder="Create Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-            {errors.password && (
-              <p
-                className="error-message"
-                style={{ color: "red", marginLeft: "25px" }}
-              >
-                {errors.password}
-              </p>
-            )}
-
-            {type === "password" ? (
-              <IoMdEyeOff
-                onClick={handleToggle}
-                className="eye-on-off-icon-signup"
-              />
-            ) : (
-              <IoMdEye
-                onClick={handleToggle}
-                className="eye-on-off-icon-signup"
-              />
-            )}
-          </div>
-
-          <button>SignUp</button>
-        </form>
-        <p>
-          Already have an account? <Link to="/">Login </Link>{" "}
-        </p>
-      </div>
-    </div>
+    <AuthLayout title="Create an account" description="Set up your personal task list.">
+      <form className="auth-form" onSubmit={submit}>
+        <Field id="username" name="username" label="Username" autoComplete="username" required />
+        <Field id="email" name="email" label="Email address" type="email" autoComplete="email" required />
+        <PasswordField id="password" autoComplete="new-password" hint="Use at least one special character." />
+        <FormError message={error} />
+        <button className="button button-primary" disabled={pending}>{pending ? "Creating account…" : "Create account"}</button>
+      </form>
+      <p className="auth-footer">Already have an account? <Link to="/login">Sign in</Link></p>
+    </AuthLayout>
   );
 }
