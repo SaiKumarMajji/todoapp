@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("")
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
